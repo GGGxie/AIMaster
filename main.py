@@ -1,4 +1,5 @@
 # 加载环境变量
+from chat.chat import Chat
 import streamlit as st
 from dotenv import load_dotenv, find_dotenv
 
@@ -12,21 +13,7 @@ from tools.python_tool import ExcelAnalyser
 from langchain_community.chat_message_histories.in_memory import ChatMessageHistory
 
 
-# def launch_agent(agent: AutoGPT):
-#     human_icon = "\U0001F468"
-#     ai_icon = "\U0001F916"
-#     chat_history = ChatMessageHistory()
-
-#     while True:
-#         task = input(f"{ai_icon}：有什么可以帮您？\n{human_icon}：")
-#         color_print(text=f"{human_icon}：{task}\n",)
-#         if task.strip().lower() == "quit":
-#             break
-#         reply = agent.run(task, chat_history, verbose=True)
-#         print(f"{ai_icon}：{reply}\n")
-#         # 写入文件
-#         color_print(text=f"{ai_icon}：{reply}\n\n")
-def launch_agent(agent: AutoGPT):
+def launch_agent(agent: AutoGPT,chat: Chat):
     st.title('🦜🔗 My-Ai-Agent')
     human_icon = "\U0001F468"
     ai_icon = "\U0001F916"
@@ -42,12 +29,11 @@ def launch_agent(agent: AutoGPT):
     messages = st.container(height=300)
     if task := st.chat_input("请输入你的问题~"):
         color_print(text=f"{human_icon}：{task}\n",)
-        
         st.session_state.messages.append({"role": "user", "text": task})
         if task.strip().lower() == "quit":
             return
         if selected_method=="chat":
-            pass
+            reply = chat.run(task)
         elif selected_method=="agent":
             # 运行智能体
             reply = agent.run(task, chat_history, verbose=True)
@@ -96,9 +82,11 @@ def main():
         main_prompt_file="./prompts/main/main.txt",
         max_thought_steps=20,
     )
-
+    chat = Chat(
+        llm=llm,
+                )
     # 运行智能体
-    launch_agent(agent)
+    launch_agent(agent,chat)
 
 
 if __name__ == "__main__":
