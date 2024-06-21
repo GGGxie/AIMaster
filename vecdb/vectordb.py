@@ -1,4 +1,4 @@
-from src.zhipu_embedding import ZhipuAIEmbeddings
+from .zhipu_embedding import ZhipuAIEmbeddings
 
 from langchain_chroma import Chroma
 

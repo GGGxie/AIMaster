@@ -7,18 +7,18 @@ from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.runnables.history import RunnableWithMessageHistory
 from langchain_community.chat_models import ChatZhipuAI
 from langchain.prompts import PromptTemplate
-from src.vectordb import get_vectordb
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
+from vecdb.vectordb import get_vectordb
 class Chat:
     def __init__(self,
                  llm,
-                 vectordbt,
-                 retriever,
+                #  vectordbt,
+                #  retriever,
                  ):
         self.llm = llm
-        self.vectordbt = vectordbt
-        self.retriever = retriever
-        self.store=[]
+        # self.vectordbt = vectordbt
+        # self.retriever = retriever
+        self.store={}
         ### Contextualize question ###
         contextualize_q_system_prompt = (
             "Given a chat history and the latest user question "
@@ -34,6 +34,8 @@ class Chat:
                 ("human", "{input}"),
             ]
         )
+        vectordbt = get_vectordb()
+        retriever=vectordbt.as_retriever()
         history_aware_retriever = create_history_aware_retriever(llm, retriever, contextualize_q_prompt)
 
         ### Answer question ###
@@ -73,7 +75,7 @@ class Chat:
     def run(
             self,
             task: str,
-            sessionid:"1",
+            sessionid="1",
     ) -> str:
         return self.conversational_rag_chain.invoke(
             {"input": task},

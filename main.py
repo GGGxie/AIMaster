@@ -50,7 +50,6 @@ def launch_agent(agent: AutoGPT,chat: Chat):
 
 
 def main():
-
     # 语言模型
     llm = ChatOpenAI(
         model="gpt-4-turbo",
