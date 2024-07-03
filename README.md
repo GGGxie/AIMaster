@@ -1,5 +1,11 @@
 # 运行步骤
 
+## **导入 apikey**
+
+导入环境变量: `export OPENAI_API_KEY=<your-openai-api-key>`
+
+导入代理: `export PROXY_URL=<your-proxy-ip>`
+
 ## 安装依赖包
 
 执行: `pip install -r requirements.txt`

@@ -1,6 +1,8 @@
 # 加载环境变量
 from chat.chat import Chat
 import streamlit as st
+import os
+import openai
 from dotenv import load_dotenv, find_dotenv
 
 from utils.print_utils import color_print
@@ -50,6 +52,11 @@ def launch_agent(agent: AutoGPT,chat: Chat):
 
 
 def main():
+    # 设置代理
+    proxy_url = os.getenv("PROXY_URL")
+    if proxy_url is not None:
+        openai.api_base = proxy_url
+        
     # 语言模型
     llm = ChatOpenAI(
         model="gpt-4-turbo",
