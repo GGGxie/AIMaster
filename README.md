@@ -20,3 +20,8 @@
 
 1. 基于个人知识库的 RAG 问答系统
 2. Agent 助手
+
+# 私密数据灌入 chroma 数据库
+
+1. 数据存入 `data` 目录下
+2. 执行:`python vecdb/loader.py`
