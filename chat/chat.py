@@ -9,16 +9,13 @@ from langchain_community.chat_models import ChatZhipuAI
 from langchain.prompts import PromptTemplate
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
 from vecdb.vectordb import get_vectordb
+store={}
 class Chat:
     def __init__(self,
                  llm,
-                #  vectordbt,
-                #  retriever,
-                 ):
+        ):
         self.llm = llm
-        # self.vectordbt = vectordbt
-        # self.retriever = retriever
-        self.store={}
+        self.store = {}
         ### Contextualize question ###
         contextualize_q_system_prompt = (
             "Given a chat history and the latest user question "
@@ -59,8 +56,8 @@ class Chat:
         rag_chain = create_retrieval_chain(history_aware_retriever, question_answer_chain)
         
         self.conversational_rag_chain = RunnableWithMessageHistory(
-            rag_chain,
-            self.__get_session_history,
+            runnable=rag_chain,
+            get_session_history=self.__get_session_history,
             input_messages_key="input",
             history_messages_key="chat_history",
             output_messages_key="answer",
@@ -68,10 +65,10 @@ class Chat:
 
 
     def __get_session_history(self,session_id: str) -> BaseChatMessageHistory:
-            if session_id not in self.store:
-                self.store[session_id] = ChatMessageHistory()
-            return self.store[session_id]
-    
+            if session_id not in store:
+                store[session_id] = ChatMessageHistory()
+            return store[session_id]
+
     def run(
             self,
             task: str,
@@ -83,4 +80,3 @@ class Chat:
                  "configurable": {"session_id":sessionid}
                 }
     )["answer"]
-    # def chat(self, question):
