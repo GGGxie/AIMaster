@@ -90,7 +90,7 @@ def main():
     )
     chat = Chat(
         llm=llm,
-                )
+    )
     # 运行智能体
     launch_agent(agent,chat)
 

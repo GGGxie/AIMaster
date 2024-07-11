@@ -6,8 +6,6 @@ from langchain.embeddings.base import Embeddings
 from langchain.pydantic_v1 import BaseModel, root_validator
 from langchain.utils import get_from_dict_or_env
 
-
-
 class ZhipuAIEmbeddings(BaseModel, Embeddings):
     """`Zhipuai Embeddings` embedding models."""
 
