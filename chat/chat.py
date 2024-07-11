@@ -17,13 +17,16 @@ class Chat:
         self.llm = llm
         self.store = {}
         ### Contextualize question ###
-        contextualize_q_system_prompt = (
-            "Given a chat history and the latest user question "
-            "which might reference context in the chat history, "
-            "formulate a standalone question which can be understood "
-            "without the chat history. Do NOT answer the question, "
-            "just reformulate it if needed and otherwise return it as is."
-        )
+        # contextualize_q_system_prompt = (
+        #     "Given a chat history and the latest user question "
+        #     "which might reference context in the chat history, "
+        #     "formulate a standalone question which can be understood "
+        #     "without the chat history. Do NOT answer the question, "
+        #     "just reformulate it if needed and otherwise return it as is."
+        # )
+        prompts = self._load_prompts("prompts/chat/chat_history.txt")
+        print(prompts)
+        contextualize_q_system_prompt = prompts["contextualize_q_system_prompt"]
         contextualize_q_prompt = ChatPromptTemplate.from_messages(
             [
                 ("system", contextualize_q_system_prompt),
@@ -36,15 +39,16 @@ class Chat:
         history_aware_retriever = create_history_aware_retriever(llm, retriever, contextualize_q_prompt)
 
         ### Answer question ###
-        system_prompt = (
-            "You are an assistant for question-answering tasks. "
-            "Use the following pieces of retrieved context to answer "
-            "the question. If you don't know the answer, say that you "
-            "don't know. Use three sentences maximum and keep the "
-            "answer concise."
-            "\n\n"
-            "{context}"
-        )
+        # system_prompt = (
+        #     "You are an assistant for question-answering tasks. "
+        #     "Use the following pieces of retrieved context to answer "
+        #     "the question. If you don't know the answer, say that you "
+        #     "don't know. Use three sentences maximum and keep the "
+        #     "answer concise."
+        #     "\n\n"
+        #     "{context}"
+        # )
+        system_prompt = prompts["system_prompt"]
         qa_prompt = ChatPromptTemplate.from_messages(
             [
                 ("system", system_prompt),
@@ -57,14 +61,25 @@ class Chat:
         
         self.conversational_rag_chain = RunnableWithMessageHistory(
             runnable=rag_chain,
-            get_session_history=self.__get_session_history,
+            get_session_history=self._get_session_history,
             input_messages_key="input",
             history_messages_key="chat_history",
             output_messages_key="answer",
         )
 
+    def _load_prompts(self, file_path):
+        prompts = {}
+        with open(file_path, 'r') as file:
+            content = file.read()
+            sections = content.split('\n\n')
+            for section in sections:
+                lines = section.split('\n', 1)
+                if len(lines) == 2:
+                    key, prompt = lines
+                    prompts[key.rstrip(':')] = prompt.strip()
+        return prompts
 
-    def __get_session_history(self,session_id: str) -> BaseChatMessageHistory:
+    def _get_session_history(self,session_id: str) -> BaseChatMessageHistory:
             if session_id not in store:
                 store[session_id] = ChatMessageHistory()
             return store[session_id]
